@@ -1,0 +1,123 @@
+#todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-container {
+  width: 100%;
+  padding: 14px 16px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+
+  background-color: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.task-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.add-task {
+  width: 100%;
+  padding: 7px;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 7px;
+}
+
+.add-task,
+.sort-select {
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.task-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.task-description {
+  margin: 0;
+  color: #b8b8b8;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.task-meta {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #b8b8b8;
+  font-size: 0.85rem;
+}
+
+.empty-tasks {
+  margin: 0;
+  color: #777;
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  border: none;
+  background: none;
+  box-shadow: none;
+
+  color: #666;
+  cursor: pointer;
+
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: currentColor;
+
+  transition: transform 0.18s ease;
+}
+
+.icon:hover {
+  color: #3fa66a;
+  transform: translateY(-2px);
+}
+
+.icon:hover svg {
+  transform: scale(1.08);
+}
