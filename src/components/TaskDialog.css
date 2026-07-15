@@ -58,6 +58,12 @@ body.dialog-open {
     resize: vertical;
 }
 
+.suggested-tag-container {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
 .task-dialog-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -72,26 +78,6 @@ body.dialog-open {
     gap: 8px;
     overflow-x: auto;
     overflow-y: hidden;
-}
-
-.rating-container {
-    display: flex;
-    gap: 6px;
-}
-
-.rating-icon-button {
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    border: none;
-    background: none;
-    box-shadow: none;
-    color: #666;
-    cursor: pointer;
-}
-
-.rating-icon-button.selected {
-    color: #ff7a00;
 }
 
 .task-dialog-errors {

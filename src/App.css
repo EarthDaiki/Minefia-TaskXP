@@ -121,6 +121,57 @@ select {
   margin-right: 5px;
 }
 
+.page-title {
+  padding: 16px 0px;
+}
+
+.emphasized-text {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background-color: #262626;
+  border: 1px solid #333;
+  color: #f6f6f6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  border: none;
+  background: none;
+  box-shadow: none;
+
+  color: #666;
+  cursor: pointer;
+
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.icon svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+  padding: 0px;
+  margin: 0px;
+  fill: currentColor;
+
+  transition: transform 0.18s ease;
+}
+
+.icon:hover {
+  color: #3fa66a;
+  transform: translateY(-2px);
+}
+
+.icon:hover svg {
+  transform: scale(1.08);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;

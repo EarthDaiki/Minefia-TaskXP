@@ -14,8 +14,10 @@ import TimeSelector from "./TimeSelector";
 
 type TaskDetailProps = {
     task: Task;
+    tags: Tag[];
     onBack: () => void;
     onLoadTasks: () => void | Promise<void>;
+    onLoadTags: () => void | Promise<void>;
 };
 
 type EditButtonProps = {
@@ -43,7 +45,7 @@ function EditButton({ onClick }: EditButtonProps) {
     );
 }
 
-function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
+function TaskDetail({ task, tags, onBack, onLoadTasks, onLoadTags}: TaskDetailProps) {
     const [editingField, setEditingField] = useState<EditingField>(null);
     const [draftString, setDraftString] = useState<string>("");
     const [draftNumber, setDraftNumber] = useState<number>(1);
@@ -389,6 +391,8 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                     {editingField === "tags" ? (
                         <div className="task-detail-edit">
                             <SelectTag
+                                tags={tags}
+                                onLoadTags={onLoadTags}
                                 selectedTags={draftTags}
                                 setSelectedTags={setDraftTags}
                             />
@@ -416,6 +420,7 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                     <div className="task-detail-item">
                         {editingField === "priority" ? (
                             <div className="task-detail-edit">
+                                <dt>Priority</dt>
                                 <IconRating
                                     Icon={FireIcon}
                                     value={draftNumber}
@@ -425,9 +430,16 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                                 <EditSaveCancel />
                             </div>
                         ) : (
-                            <div className="task-detail-value">
+                            <div className="task-detail-rating">
                                 <dt>Priority</dt>
-                                <dd>{task.priority}</dd>
+                                <dd>
+                                    <IconRating
+                                        Icon={FireIcon}
+                                        value={task.priority}
+                                        max={5}
+                                        readOnly={true}
+                                    />
+                                </dd>
                             </div>
                         )}
                         {editingField !== "priority" && (
@@ -438,6 +450,7 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                     <div className="task-detail-item">
                         {editingField === "difficulty" ? (
                             <div className="task-detail-edit">
+                                <dt>Difficulty</dt>
                                 <IconRating
                                     Icon={BrainIcon}
                                     value={draftNumber}
@@ -447,9 +460,16 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                                 <EditSaveCancel />
                             </div>
                         ) : (
-                            <div className="task-detail-value">
+                            <div className="task-detail-rating">
                                 <dt>Difficulty</dt>
-                                <dd>{task.difficulty}</dd>
+                                <dd>                                
+                                    <IconRating
+                                        Icon={BrainIcon}
+                                        value={task.difficulty}
+                                        max={5}
+                                        readOnly={true}
+                                    />
+                                </dd>
                             </div>
                         )}
                         {editingField !== "difficulty" && (
@@ -460,6 +480,7 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                     <div className="task-detail-item">
                         {editingField === "estimated_minutes" ? (
                             <div className="task-detail-edit">
+                                <dt>Estimated Minutes</dt>
                                 <input
                                     id="estimated-minutes"
                                     className="task-dialog-input estimated-minutes"
@@ -498,6 +519,7 @@ function TaskDetail({ task, onBack, onLoadTasks}: TaskDetailProps) {
                     <div className="task-detail-item">
                         {editingField === "due_at" ? (
                             <div className="task-detail-edit">
+                                <dt>Due</dt>
                                 <DateSelector
                                     value={draftString}
                                     onChange={setDraftString}

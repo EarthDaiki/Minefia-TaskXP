@@ -117,38 +117,3 @@
   color: #f6f6f6;
   overflow-wrap: anywhere;
 }
-
-.icon {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-
-  border: none;
-  background: none;
-  box-shadow: none;
-
-  color: #666;
-  cursor: pointer;
-
-  transition:
-    color 0.18s ease,
-    transform 0.18s ease;
-}
-
-.icon svg {
-  width: 22px;
-  height: 22px;
-  display: block;
-  fill: currentColor;
-
-  transition: transform 0.18s ease;
-}
-
-.icon:hover {
-  color: #3fa66a;
-  transform: translateY(-2px);
-}
-
-.icon:hover svg {
-  transform: scale(1.08);
-}

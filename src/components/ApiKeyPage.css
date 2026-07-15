@@ -1,0 +1,156 @@
+.api-key-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.back-btn {
+  width: fit-content;
+  min-height: 40px;
+  padding: 8px 12px;
+
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #1f1f1f;
+  box-shadow: none;
+
+  color: #b8b8b8;
+}
+
+.back-btn:hover {
+  background-color: #262626;
+  border-color: #444;
+  color: #f6f6f6;
+}
+
+.api-key-select-field {
+  padding: 16px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #1f1f1f;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.api-key-select-field label {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.api-key-select-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #262626;
+  box-shadow: none;
+
+  color: #f6f6f6;
+}
+
+.api-key-select-field select:focus {
+  border-color: #555;
+}
+
+.form-container {
+  padding: 20px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #1f1f1f;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-container .container {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-container label {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.form-container input {
+  width: 100%;
+  min-height: 42px;
+
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #262626;
+  box-shadow: none;
+
+  color: #f6f6f6;
+}
+
+.form-container input:focus {
+  border-color: #555;
+}
+
+.form-container button {
+  width: fit-content;
+  min-height: 42px;
+  padding: 8px 16px;
+
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #262626;
+  box-shadow: none;
+
+  color: #f6f6f6;
+}
+
+.form-container button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-container button:hover {
+  background-color: #333;
+  border-color: #444;
+}
+
+.form-container button:disabled:hover {
+  background-color: #262626;
+  border-color: #333;
+  color: #f6f6f6;
+}
+
+.error-message-container {
+  padding: 12px;
+  border: 1px solid #5a2a2a;
+  border-radius: 8px;
+  background-color: #2a1717;
+  color: #ffb3b3;
+}
+
+.error-message-container p {
+  margin: 0;
+}
+
+.success-message-container {
+  padding: 12px;
+  border: 1px solid #2f6f46;
+  border-radius: 8px;
+  background-color: #172a1d;
+  color: #9ee6b3;
+}
+
+.success-message-container p {
+  margin: 0;
+}

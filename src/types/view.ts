@@ -15,8 +15,8 @@ export const sidebarSections = [
     label: "AI Agent",
     items: [
       { value: "ai-quick-add", label: "Quick Add", showCount: false, showNotification: false },
-      { value: "ai-break-down", label: "Break Down", showCount: false, showNotification: false },
-      { value: "ai-prioritize", label: "Prioritize", showCount: false, showNotification: false },
+      // { value: "ai-break-down", label: "Break Down", showCount: false, showNotification: false },
+      // { value: "ai-prioritize", label: "Prioritize", showCount: false, showNotification: false },
     ],
   },
   {
@@ -31,7 +31,6 @@ export const sidebarSections = [
     label: "Settings",
     items: [
       { value: "settings", label: "Settings", showCount: false, showNotification: false },
-      { value: "tag-management", label: "Tag Management", showCount: false, showNotification: false },
     ],
   },
 ] as const;

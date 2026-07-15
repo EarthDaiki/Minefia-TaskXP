@@ -1,37 +1,27 @@
 import { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import type { Tag } from "../types/tag";
 import TagDialog from "./TagDialog"
 import "./SelectTag.css";
 
 type SelectTagProps = {
+    tags: Tag[];
+    onLoadTags: () => void | Promise<void>;
     selectedTags: Tag[];
     setSelectedTags: React.Dispatch<React.SetStateAction<Tag[]>>;
 };
 
-export function SelectTag({ selectedTags, setSelectedTags}: SelectTagProps) {
-    const [tags, setTags] = useState<Tag[]>([]);
+export function SelectTag({ tags, onLoadTags, selectedTags, setSelectedTags}: SelectTagProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const availableTags = tags.filter(
         (tag) => !selectedTags.some((selectedTag) => selectedTag.id === tag.id)
     );
     useEffect(() => {
-        loadTags();
         document.body.classList.add("dialog-open");
         return () => {
             document.body.classList.remove("dialog-open");
         };
     }, []);
-
-    async function loadTags() {
-        try {
-            const loadedTags = await invoke<Tag[]>("get_tags");
-            setTags(loadedTags);
-        } catch (error) {
-            console.error("Failed to load tags:", error);
-        }
-    }
 
     function addSelectedTag(addTag: Tag) {
         if (selectedTags.some((tag) => tag.id === addTag.id)) return;
@@ -108,7 +98,7 @@ export function SelectTag({ selectedTags, setSelectedTags}: SelectTagProps) {
             {isDialogOpen && (
                 <TagDialog
                     onSave={async () => {
-                        await loadTags();
+                        await onLoadTags();
                     }}
                     onClose={() => {
                         setIsDialogOpen(false);

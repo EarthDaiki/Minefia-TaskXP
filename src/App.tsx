@@ -10,13 +10,20 @@ import type { Tag } from "./types/tag";
 import { getVisibleTasks } from "./utils/taskFilters";
 import { SidebarInfo } from "./types/sidebarInfo";
 import CalendarView from "./components/Calendar";
-import TagManagementPage from "./components/TagManagementPage";
+import QuickAddTaskPage from "./components/AIQuickAddPage";
+import SettingsPage from "./components/SettingsPage";
+import type { SettingsPageId, ApiKeyPageId} from "./types/settingPage";
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [currentView, setCurrentView] = useState<View>("list");
+  const [settingsInitialPage, setSettingsInitialPage] =
+    useState<SettingsPageId>("root");
+
+  const [apiKeyInitialPage, setApiKeyInitialPage] =
+    useState<ApiKeyPageId>("root");
   const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
 
   // console.log(tasks);
@@ -91,10 +98,10 @@ function App() {
   function handleEventClick(task_id: number) {
     setSelectedTaskId(task_id);
   }
-
-  async function reloadAfterTagDelete() {
-    await getTags();
-    await getTasks();
+  function openAddApiKeyPage() {
+    setSettingsInitialPage("api_keys");
+    setApiKeyInitialPage("add_api_key");
+    setCurrentView("settings");
   }
 
   function renderCurrentView() {
@@ -103,16 +110,20 @@ function App() {
         return (
           <TaskDetail
             task={selectedTask}
+            tags={tags}
             onBack={() => setSelectedTaskId(null)}
             onLoadTasks={getTasks}
+            onLoadTags={getTags}
           />
         );
       }
       return (
         <TaskPage
           tasks={listTasks}
+          tags={tags}
           onSelectTask={(taskId: number) => setSelectedTaskId(taskId)}
           onLoadTasks={getTasks}
+          onLoadTags={getTags}
           exceptMessage="No tasks yet."
         />
       );
@@ -123,16 +134,20 @@ function App() {
         return (
           <TaskDetail
             task={selectedTask}
+            tags={tags}
             onBack={() => setSelectedTaskId(null)}
             onLoadTasks={getTasks}
+            onLoadTags={getTags}
           />
         );
       }
       return (
         <TaskPage
           tasks={todayTasks}
+          tags={tags}
           onSelectTask={(taskId: number) => setSelectedTaskId(taskId)}
           onLoadTasks={getTasks}
+          onLoadTags={getTags}
           exceptMessage="No today's tasks."
         />
       );
@@ -143,16 +158,20 @@ function App() {
         return (
           <TaskDetail
             task={selectedTask}
+            tags={tags}
             onBack={() => setSelectedTaskId(null)}
             onLoadTasks={getTasks}
+            onLoadTags={getTags}
           />
         );
       }
       return (
         <TaskPage
           tasks={upcomingTasks}
+          tags={tags}
           onSelectTask={(taskId: number) => setSelectedTaskId(taskId)}
           onLoadTasks={getTasks}
+          onLoadTags={getTags}
           exceptMessage="No upcoming tasks."
         />
       )
@@ -163,8 +182,10 @@ function App() {
         return (
           <TaskDetail
             task={selectedTask}
+            tags={tags}
             onBack={() => setSelectedTaskId(null)}
             onLoadTasks={getTasks}
+            onLoadTags={getTags}
           />
         );
       }
@@ -181,25 +202,34 @@ function App() {
         return (
           <TaskDetail
             task={selectedTask}
+            tags={tags}
             onBack={() => setSelectedTaskId(null)}
             onLoadTasks={getTasks}
+            onLoadTags={getTags}
           />
         );
       }
       return (
         <TaskPage
           tasks={completedTasks}
+          tags={tags}
           onSelectTask={(taskId: number) => setSelectedTaskId(taskId)}
           onLoadTasks={getTasks}
+          onLoadTags={getTags}
           exceptMessage="No completed tasks."
         />
       )
     }
-    // if (currentView === "ai-quick-add") {
-    //   return(
-    //     <p>This page is not available.</p>
-    //   );
-    // }
+    if (currentView === "ai-quick-add") {
+      return(
+        <QuickAddTaskPage
+          tags={tags}
+          onLoadTasks={getTasks}
+          onLoadTags={getTags}
+          onAddApiKey={openAddApiKeyPage}
+        />
+      );
+    }
 
     // if (currentView === "ai-break-down") {
     //   return(
@@ -217,32 +247,35 @@ function App() {
         return (
           <TaskDetail
             task={selectedTask}
+            tags={tags}
             onBack={() => setSelectedTaskId(null)}
             onLoadTasks={getTasks}
+            onLoadTags={getTags}
           />
         );
       }
       return (
         <TaskPage
           tasks={tagTasks}
+          tags={tags}
           onSelectTask={(taskId: number) => setSelectedTaskId(taskId)}
           onLoadTasks={getTasks}
+          onLoadTags={getTags}
           exceptMessage="No tasks for this tag."
         />
       )
     }
 
-    // if (currentView === "settings") {
-    //   return (
-    //     <p>This page is not available.</p>
-    //   )
-    // }
-
-    if (currentView === "tag-management") {
+    if (currentView === "settings") {
       return (
-        <TagManagementPage 
+        <SettingsPage 
           tags={tags}
-          onLoadTags={reloadAfterTagDelete}
+          initialPage={settingsInitialPage}
+          initialApiKeyPage={apiKeyInitialPage}
+          onLoadTags={async () => {
+            await getTags()
+            await getTasks()
+          }}
         />
       )
     }

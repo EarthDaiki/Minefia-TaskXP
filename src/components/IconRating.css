@@ -1,0 +1,54 @@
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rating-icon,
+.rating-icon-button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: none;
+  box-shadow: none;
+
+  color: #666;
+}
+
+.rating-icon-button {
+  cursor: pointer;
+}
+
+.rating-icon {
+  cursor: default;
+}
+
+.rating-icon svg,
+.rating-icon-button svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: currentColor;
+}
+
+.rating-icon.selected,
+.rating-icon-button.selected {
+  color: #ff7a00;
+}
+
+.rating-icon-button:hover {
+  color: #ff9a2f;
+  transform: translateY(-1px);
+}
+
+.rating-icon-button {
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}

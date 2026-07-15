@@ -8,6 +8,8 @@ static DB: OnceLock<Mutex<Connection>> = OnceLock::new();
 
 use serde::{Serialize, de::value};
 
+use crate::keychain::{delete_key, save_key};
+
 #[derive(Serialize, Debug)]
 pub struct Tag {
     id: i64,
@@ -31,6 +33,14 @@ pub struct Task {
     updated_at: i64,
     completed_at: Option<i64>,
     tags: Vec<Tag>
+}
+
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct OpenAIApiKeyName {
+    id: i64,
+    name: String,
+    main_key: i64
 }
 
 
@@ -86,6 +96,15 @@ pub fn init_db() -> Result<(), String> {
 
         FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
         FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+    "CREATE TABLE IF NOT EXISTS openai_key_names (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            main_key INTEGER NOT NULL DEFAULT 0 CHECK (main_key IN (0, 1))
         )",
         [],
     ).map_err(|e| e.to_string())?;
@@ -156,6 +175,25 @@ pub fn get_tags() -> Result<Vec<Tag>, String> {
     }
 
     Ok(tags)
+}
+
+pub fn get_tag_names() -> Result<Vec<String>, String> {
+    let conn = get_conn()?;
+    let mut stmt = conn
+        .prepare("SELECT name FROM tags ORDER BY id")
+        .map_err(|e| e.to_string())?;
+    let tag_rows = stmt
+        .query_map([], |row| {
+            row.get::<_, String>(0)
+        })
+        .map_err(|e| e.to_string())?;
+
+    let mut tag_names = Vec::new();
+    for tag_name in tag_rows {
+        tag_names.push(tag_name.map_err(|e| e.to_string())?);
+    }
+
+    Ok(tag_names)
 }
 
 #[tauri::command]
@@ -297,6 +335,23 @@ pub fn add_task(
         ).map_err(|e| e.to_string())?;
     }
     tx.commit().map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+
+#[tauri::command]
+pub fn delete_task(task_id: i64) -> Result<(), String> {
+    let conn = get_conn()?;
+    let changed = conn
+        .execute(
+            "DELETE FROM tasks WHERE id = ?1", 
+            params![task_id]
+        )
+        .map_err(|e| e.to_string())?;
+
+    if changed == 0 {
+        return Err("Task not found.".to_string());
+    }
     Ok(())
 }
 
@@ -670,5 +725,150 @@ pub fn reset_start_task(task_id: i64) -> Result<(), String> {
         return Err("Task not found".to_string());
     }
 
+    Ok(())
+}
+
+#[tauri::command]
+pub fn add_openai_key_name(name: String, key: String) -> Result<(), String> {
+    let conn = get_conn()?;
+
+    let count: i64 = conn
+        .query_row(
+            "SELECT COUNT(*) FROM openai_key_names",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+
+    let main_key: i64 = if count == 0 {1} else {0};
+
+    conn
+        .execute(
+        "INSERT INTO openai_key_names (
+            name,
+            main_key
+        ) VALUES (?1, ?2)",
+        params![
+            name,
+            main_key
+        ],
+        )
+        .map_err(|e| e.to_string())?;
+
+    save_key(name, key).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn set_main_openai_key_name(id: i64) -> Result<(), String> {
+    let mut conn = get_conn()?;
+
+    let tx = conn
+        .transaction()
+        .map_err(|e| e.to_string())?;
+
+    let changed: i64 = tx
+        .query_row(
+            "SELECT COUNT(*) FROM openai_key_names WHERE id = ?1",
+            params![id],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+
+    if changed == 0 {
+        return Err("OpenAI key name not found.".to_string());
+    }
+
+    let changed = tx
+        .execute(
+            "UPDATE openai_key_names
+            SET
+                main_key = 0",
+            params![]
+        )
+        .map_err(|e| e.to_string())?;
+
+    if changed == 0 {
+        return Err("Could not set main_key".to_string());
+    }
+
+    let changed = tx
+        .execute(
+            "UPDATE openai_key_names
+            SET
+                main_key = 1
+            WHERE id = ?1", 
+            params![id]
+        )
+        .map_err(|e| e.to_string())?;
+
+    if changed == 0 {
+        return Err("Could not set main_key".to_string());
+    }
+
+    tx.commit().map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_main_openai_key_name() -> Result<String, String> {
+    let conn = get_conn()?;
+
+    let name = conn
+        .query_row(
+        "SELECT name FROM openai_key_names WHERE main_key = 1 LIMIT 1",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+
+    Ok(name)
+}
+
+#[tauri::command]
+pub fn get_openai_key_names() -> Result<Vec<OpenAIApiKeyName>, String> {
+    let conn: MutexGuard<'_, Connection> = get_conn()?;
+    let mut stmt = conn
+        .prepare("SELECT id, name, main_key FROM openai_key_names ORDER BY id")
+        .map_err(|e| e.to_string())?;
+    let key_rows = stmt.query_map([], |row| {
+        Ok(OpenAIApiKeyName {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            main_key: row.get(2)?
+        })
+    }).map_err(|e| e.to_string())?;
+
+    let mut keys = Vec::new();
+    for key in key_rows {
+        keys.push(key.map_err(|e| e.to_string())?);
+    }
+
+    Ok(keys)
+}
+
+#[tauri::command]
+pub fn delete_openai_key_name(id: i64) -> Result<(), String> {
+    let conn = get_conn()?;
+    let name: String = conn
+        .query_row(
+            "SELECT name FROM openai_key_names WHERE id = ?1",
+            params![id],
+            |row| row.get(0),
+        )
+        .map_err(|_| "OpenAI key name not found.".to_string())?;
+    let changed = conn
+        .execute(
+            "DELETE FROM openai_key_names WHERE id = ?1", 
+            params![id]
+        )
+        .map_err(|e| e.to_string())?;
+
+    if changed == 0 {
+        return Err("OpenAI key name not found.".to_string());
+    }
+    delete_key(&name).map_err(|e| e.to_string())?;
     Ok(())
 }
