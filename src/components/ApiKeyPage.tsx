@@ -44,26 +44,36 @@ function ApiKeyDeletePage({keyNames, onLoadKeys}: ApiKeyDeletePageProps) {
     const [selectedKeyNameId, setSelectedKeyNameId] = useState<number | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const selectedKey = keyNames.find((key) => key.id === selectedKeyNameId) ?? null;
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errors, setErrors] = useState<string[]>([]);
 
     async function handleDelete() {
+        const newErrors = [];
         if (selectedKeyNameId === null) {
-            console.error("Key name is not selected");
+            newErrors.push("Key name is not selected");
             return;
         } else {
             try {
                 await invoke("delete_openai_key_name",{
                     id: selectedKeyNameId
                 });
+                setSuccessMessage("API key deleted successfully.");
             } catch (error) {
-                console.error(String(error));
+                newErrors.push(String(error));
             }
         }
         setIsDialogOpen(false);
         await onLoadKeys();
+        if (newErrors.length !== 0) {
+            setErrors(newErrors);
+            return;
+        }
+        setErrors([]);
     }
 
     function handleCancel() {
         setIsDialogOpen(false);
+        setErrors([]);
     }
 
     return (
@@ -89,6 +99,18 @@ function ApiKeyDeletePage({keyNames, onLoadKeys}: ApiKeyDeletePageProps) {
                         </select>
                     </div>
                 </div>
+                {errors.length > 0 && (
+                    <div className="error-message-container">
+                        {errors.map((error, index) => (
+                            <p key={index}>{error}</p>
+                        ))}
+                    </div>
+                )}
+                {successMessage !== "" && (
+                    <div className="success-message-container">
+                        <p>{successMessage}</p>
+                    </div>
+                )}
                 <button
                     className="tag-delete-button"
                     disabled={selectedKeyNameId === null}
@@ -145,7 +167,7 @@ function ApiKeyAddPage({
                     <label htmlFor="api-key">API KEY</label>
                     <input 
                         id="api-key"
-                        type="text"
+                        type="password"
                         value={apiKey}
                         placeholder="Enter an API KEY"
                         onChange={(e) => setApiKey(e.target.value)}
@@ -168,6 +190,7 @@ function ApiKeyAddPage({
             <button
                 type="button"
                 onClick={handleClick}
+                disabled={keyName.trim() === "" || apiKey.trim() === ""}
             >
                 Save
             </button>
@@ -190,6 +213,7 @@ function ApiKeyRootPage({
     }
     return (
         <div className="root-container">
+            <h2 className="page-title">API Key</h2>
             {keyNames.length > 0 && (
                 <div className="api-key-select-field">
                     <label>Your API Key</label>

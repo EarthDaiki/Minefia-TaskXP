@@ -18,8 +18,7 @@ type TagManagementRootPageProps = {
     isDialogOpen: boolean;
     setTagOption: (value: number | "") => void;
     setIsDialogOpen: (value: boolean) => void;
-    handleDelete: () => void;
-    handleCancel: () => void;
+    onLoadTags: () => void | Promise<void>;
 };
 
 function TagManagementRootPage({
@@ -28,10 +27,38 @@ function TagManagementRootPage({
     isDialogOpen,
     setTagOption,
     setIsDialogOpen,
-    handleDelete,
-    handleCancel
+    onLoadTags,
 }: TagManagementRootPageProps) {
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errors, setErrors] = useState<string[]>([]);
     const selectedTag = tags.find((tag) => tag.id === tagOption) ?? null;
+
+    async function handleDelete() {
+        const newErrors = []
+        if (tagOption === "") {
+            newErrors.push("tag option is not selected.");
+        } else {
+            try {
+                await invoke("delete_tag",{
+                    tagId: tagOption
+                });
+                setSuccessMessage("Tag deleted successfully.")
+            } catch (error) {
+                newErrors.push(String(error));
+            }
+        }
+        await onLoadTags();
+        setIsDialogOpen(false);
+        if (newErrors.length !== 0) {
+            setErrors(newErrors);
+            return;
+        }
+        setErrors([]);
+    }
+    function handleCancel() {
+        setIsDialogOpen(false);
+        setErrors([]);
+    }
     return (
         <div className="root-container">
             <h2 className="page-title">Delete Tag</h2>
@@ -55,6 +82,18 @@ function TagManagementRootPage({
                         </select>
                     </div>
                 </div>
+                {errors.length > 0 && (
+                    <div className="error-message-container">
+                        {errors.map((error, index) => (
+                            <p key={index}>{error}</p>
+                        ))}
+                    </div>
+                )}
+                {successMessage !== "" && (
+                    <div className="success-message-container">
+                        <p>{successMessage}</p>
+                    </div>
+                )}
                 <button
                     className="tag-delete-button"
                     disabled={tagOption === ""}
@@ -100,27 +139,6 @@ function TagManagementPage({tags, onLoadTags, onBack}: TagManagementPageProps) {
         onBack();
     }
 
-    async function handleDelete() {
-        if (tagOption === "") {
-            console.error("tag option is not selected");
-
-        } else {
-            try {
-                console.log("delete");
-                await invoke("delete_tag",{
-                    tagId: tagOption
-                });
-            } catch (error) {
-                console.error(String(error));
-            }
-        }
-        await onLoadTags();
-        setIsDialogOpen(false);
-    }
-    function handleCancel() {
-        setIsDialogOpen(false);
-    }
-
     function renderPage() {
         switch (selectedTagPage) {
             case "root":
@@ -131,8 +149,7 @@ function TagManagementPage({tags, onLoadTags, onBack}: TagManagementPageProps) {
                         isDialogOpen={isDialogOpen}
                         setTagOption={setTagOption}
                         setIsDialogOpen={setIsDialogOpen}
-                        handleDelete={handleDelete}
-                        handleCancel={handleCancel}
+                        onLoadTags={onLoadTags}
                     />
                 );
             default:
