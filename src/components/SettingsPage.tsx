@@ -11,9 +11,10 @@ type SettingPageProps = {
     initialPage: SettingsPageId;
     initialApiKeyPage: ApiKeyPageId;
     onLoadTags: () => void | Promise<void>;
+    onReset:() => void;
 }
 
-function SettingsPage({tags, initialPage, initialApiKeyPage, onLoadTags}: SettingPageProps) {
+function SettingsPage({tags, initialPage, initialApiKeyPage, onLoadTags, onReset}: SettingPageProps) {
     const [selectedPage, setSelectedPage] = useState<SettingsPageId>(initialPage);
 
     function SettingRootPage() {
@@ -49,7 +50,7 @@ function SettingsPage({tags, initialPage, initialApiKeyPage, onLoadTags}: Settin
             case "root":
                 return <SettingRootPage />
             case "api_keys":
-                return <ApiKeyPage initialPage={initialApiKeyPage} onBack={() => setSelectedPage("root")}/>
+                return <ApiKeyPage initialPage={initialApiKeyPage} onBack={() => setSelectedPage("root")} onReset={onReset}/>
             case "tag":
                 return <TagManagementPage tags={tags} onLoadTags={onLoadTags} onBack={() => setSelectedPage("root")}/>
             default:

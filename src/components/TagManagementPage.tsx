@@ -31,6 +31,7 @@ function TagManagementRootPage({
     handleDelete,
     handleCancel
 }: TagManagementRootPageProps) {
+    const selectedTag = tags.find((tag) => tag.id === tagOption) ?? null;
     return (
         <div className="root-container">
             <h2 className="page-title">Delete Tag</h2>
@@ -65,7 +66,7 @@ function TagManagementRootPage({
             {isDialogOpen ? (
                 <div className="overlay">
                     <div className="dialog">
-                        <h2>Are you sure you want to delete this tag?</h2>
+                        <h2>Are you sure you want to delete "{selectedTag?.name}"?</h2>
                         <div className="button-container">
                             <button onClick={handleDelete}>
                                 Delete

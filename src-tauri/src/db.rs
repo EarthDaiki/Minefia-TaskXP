@@ -1,12 +1,11 @@
 use rusqlite::{Connection, params};
-use tauri::{utils::acl::Number, webview::cookie::time::macros::datetime};
-use core::num;
-use std::{string, sync::{Mutex, MutexGuard, OnceLock}};
+use std::{sync::{Mutex, MutexGuard, OnceLock}};
 use chrono::{Local, NaiveDateTime, NaiveDate, TimeZone};
 
 static DB: OnceLock<Mutex<Connection>> = OnceLock::new();
 
-use serde::{Serialize, de::value};
+use serde::{Serialize};
+use tauri::{Manager};
 
 use crate::keychain::{delete_key, save_key};
 
@@ -44,8 +43,16 @@ pub struct OpenAIApiKeyName {
 }
 
 
-pub fn init_db() -> Result<(), String> {
-    let conn = Connection::open("taskxp.db").map_err(|e| e.to_string())?;
+pub fn init_db(app: &tauri::AppHandle) -> Result<(), String> {
+    let app_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    std::fs::create_dir_all(&app_dir).map_err(|e| e.to_string())?;
+    let db_path = app_dir.join("taskxp.db");
+    println!("db path: {}", db_path.display());
+
+    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
 
     conn.execute("PRAGMA foreign_keys = ON", []).map_err(|e| e.to_string())?;
 

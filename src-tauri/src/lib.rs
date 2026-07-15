@@ -4,8 +4,11 @@ mod keychain;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    db::init_db().expect("Failed to initialize database");
     tauri::Builder::default()
+        .setup(|app| {
+            db::init_db(app.handle()).map_err(|e| format!("Failed to initialize database: {}", e))?;
+            Ok(())
+        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             db::get_tags,

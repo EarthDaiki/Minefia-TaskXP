@@ -15,6 +15,7 @@ type OpenAiKeyName = {
 type ApiKeyPageProps = {
     initialPage: ApiKeyPageId;
     onBack: () => void;
+    onReset: () => void;
 }
 
 type ApiKeyAddPageProps = {
@@ -50,7 +51,6 @@ function ApiKeyDeletePage({keyNames, onLoadKeys}: ApiKeyDeletePageProps) {
             return;
         } else {
             try {
-                console.log("delete");
                 await invoke("delete_openai_key_name",{
                     id: selectedKeyNameId
                 });
@@ -100,7 +100,7 @@ function ApiKeyDeletePage({keyNames, onLoadKeys}: ApiKeyDeletePageProps) {
             {isDialogOpen ? (
                 <div className="overlay">
                     <div className="dialog">
-                        <h2>Are you sure you want to delete {selectedKey?.name}?</h2>
+                        <h2>Are you sure you want to delete "{selectedKey?.name}"?</h2>
                         <div className="button-container">
                             <button onClick={handleDelete}>
                                 Delete
@@ -223,7 +223,7 @@ function ApiKeyRootPage({
     );
 }
 
-function ApiKeyPage({ initialPage, onBack }: ApiKeyPageProps) {
+function ApiKeyPage({ initialPage, onBack, onReset }: ApiKeyPageProps) {
     const [keyName, setKeyName] = useState("");
     const [apiKey, setApiKey] = useState("");
     const [errors, setErrors] = useState<string[]>([]);
@@ -235,6 +235,7 @@ function ApiKeyPage({ initialPage, onBack }: ApiKeyPageProps) {
 
     useEffect(() => {
         getOpenAiKeyNames();
+        onReset();
     }, []);
 
     function goBack() {
@@ -273,13 +274,19 @@ function ApiKeyPage({ initialPage, onBack }: ApiKeyPageProps) {
 
     async function handleClick() {
         const newErrors: string[] = [];
-
-        if (keyName.trim() === "") {
+        const name = keyName.trim();
+        const key = apiKey.trim();
+        if (name === "") {
             newErrors.push("Identifier name is required.");
         }
 
-        if (apiKey.trim() === "") {
+        if (key === "") {
             newErrors.push("API key is required.");
+        }
+
+        const saveName = keyNames.find((keyName) => keyName.name === name);
+        if (saveName) {
+            newErrors.push("Key name is already existed.")
         }
 
         if (newErrors.length !== 0) {

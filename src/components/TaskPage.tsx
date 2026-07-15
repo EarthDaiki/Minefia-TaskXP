@@ -156,7 +156,7 @@ function TaskPage({tasks, tags, onSelectTask, onLoadTasks, onLoadTags, exceptMes
             {isDeleteDialogOpen ? (
                 <div className="overlay">
                     <div className="dialog">
-                        <h2>Are you sure you want to delete {selectedDeleteTask?.title} task?</h2>
+                        <h2>Are you sure you want to delete "{selectedDeleteTask?.title}" task?</h2>
                         <div className="button-container">
                             <button onClick={handleDelete}>
                                 Delete

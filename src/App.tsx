@@ -279,6 +279,10 @@ function App() {
             await getTags()
             await getTasks()
           }}
+          onReset={() => {
+            setApiKeyInitialPage("root");
+            setSettingsInitialPage("root");
+          }}
         />
       )
     }
