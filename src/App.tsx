@@ -78,6 +78,9 @@ function App() {
 
   const tagTaskCounts = new Map<number, number>();
   for (const task of tasks) {
+    if (task.completed !== 0) {
+      continue;
+    }
     for (const tag of task.tags) {
       tagTaskCounts.set(tag.id, (tagTaskCounts.get(tag.id) ?? 0) + 1);
     }
